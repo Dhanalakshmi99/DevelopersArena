@@ -1,0 +1,622 @@
+							📚 Theory Concepts:
+
+============================================================================================================================================
+
+📘 JavaScript Notes With Examples:
+
+1. JavaScript Syntax & Data Types
+
+Basic Syntax:
+
+JavaScript is case-sensitive.
+
+Statements end with ; (optional but recommended).
+
+Code blocks use { }.
+
+Comments:
+
+// single line
+/* multi-line */
+
+Data Types:
+
+Primitive Types:
+
+String: "Hello"
+
+Number: 10, 3.14
+
+Boolean: true, false
+
+Undefined: variable declared but no value
+
+Null: intentional empty value
+
+BigInt: very large numbers
+
+Symbol: unique identifiers
+
+Non-Primitive:
+
+Object: { key: value }
+
+Array: [1, 2, 3]
+
+Function:
+
+Example:
+
+let name = "John";       // string
+let age = 25;            // number
+let isStudent = true;    // boolean
+let x;                   // undefined
+let y = null;            // null
+====================================================================================================================================================
+
+2. Variables:
+
+Variable Keywords:
+
+var: function-scoped (old)
+
+let: block-scoped (recommended)
+
+const: constant value (cannot reassign)
+
+Example:
+
+let city = "London";
+const country = "UK";
+var score = 50;
+===================================================================================================================================================
+
+3. Functions:
+
+Types of Functions:
+
+Function Declaration:
+
+function greet() {
+  console.log("Hello!");
+}
+
+Function with Parameters:
+
+function add(a, b) {
+  return a + b;
+}
+
+Arrow Function:
+
+const multiply = (a, b) => a * b;
+================================================================================================================================================================
+
+4. Control Structures:
+
+If / Else:
+
+let num = 10;
+if (num > 0) {
+  console.log("Positive");
+} else {
+  console.log("Not positive");
+}
+
+Switch:
+
+let day = 2;
+switch(day){
+  case 1: console.log("Mon"); break;
+  case 2: console.log("Tue"); break;
+  default: console.log("Other");
+}
+
+Loops:
+
+For Loop:
+
+for (let i = 1; i <= 5; i++) {
+  console.log(i);
+}
+
+While Loop:
+
+let i = 1;
+while (i <= 5) {
+  console.log(i);
+  i++;
+}
+====================================================================================================================================================
+5. DOM Manipulation: Selecting & Modifying Elements:
+
+Selecting Elements:
+
+document.getElementById("title");
+document.querySelector(".box");
+document.querySelectorAll("p");
+
+Modifying Content:
+
+document.getElementById("title").textContent = "New Title";
+
+Modifying Style:
+
+document.querySelector(".box").style.backgroundColor = "yellow";
+
+Example:
+
+<h2 id="title">Hello</h2>
+<script>
+  document.getElementById("title").textContent = "Welcome!";
+</script>
+================================================================================================================================================
+
+6. Event Handling: click, submit, change:
+
+Click Event:
+
+document.getElementById("btn").addEventListener("click", function(){
+  alert("Button clicked!");
+});
+
+Submit Event:
+
+document.getElementById("form").addEventListener("submit", function(e){
+  e.preventDefault();
+  console.log("Form submitted!");
+});
+
+Change Event:
+
+document.getElementById("color").addEventListener("change", function(){
+  console.log("Selected:", this.value);
+});
+=====================================================================================================================================================
+7. Arrays and Objects:
+
+Arrays:
+
+let fruits = ["apple", "banana", "mango"];
+console.log(fruits[1]);  // banana
+fruits.push("orange");   // add item
+
+Objects:
+
+let person = {
+  name: "John",
+  age: 30,
+  city: "Delhi"
+};
+console.log(person.name);
+
+Array of Objects Example:
+
+let students = [
+  {name: "Aman", grade: "A"},
+  {name: "Sara", grade: "B"},
+];
+console.log(students[0].name);
+==============================================================================================================================================
+
+8. Basic Form Validation:
+
+Simple Example:
+
+<form id="myForm">
+  <input type="text" id="username" placeholder="Enter name">
+  <button type="submit">Submit</button>
+</form>
+
+<script>
+document.getElementById("myForm").addEventListener("submit", function(e){
+  let name = document.getElementById("username").value;
+  
+  if(name === ""){
+    e.preventDefault();
+    alert("Name is required!");
+  }
+});
+</script>
+
+Validation Checks You Can Do:
+
+1.Empty field check
+
+2.Email pattern check
+
+3.Minimum length
+
+4.Number range
+============================================================================================================================================
+							🛠️ Hands-On Practice:
+
+============================================================================================================================================
+1️⃣ Add Interactivity to Your Portfolio Website
+
+✔️ What to Add
+
+Change theme (dark/light mode)
+
+Show/hide sections
+
+Button hover effects
+
+Animate text
+
+✔️ Example: Toggle Dark Mode
+
+<button id="toggleBtn">Toggle Dark Mode</button>
+
+<script>
+document.getElementById("toggleBtn").addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+});
+</script>
+
+<style>
+.dark {
+  background: #222;
+  color: white;
+}
+</style>
+================================================================================================================================================================
+
+2️⃣ Create a Dynamic To-Do List Application
+
+✔️ Features:
+
+Add tasks
+
+Remove tasks
+
+Mark tasks as completed
+
+✔️ Basic Example:
+
+<input id="taskInput" placeholder="Enter task">
+<button id="addBtn">Add</button>
+<ul id="taskList"></ul>
+
+<script>
+document.getElementById("addBtn").addEventListener("click", () => {
+  const task = document.getElementById("taskInput").value;
+
+  if(task.trim() === "") return;
+
+  const li = document.createElement("li");
+  li.textContent = task;
+
+  li.addEventListener("click", () => li.classList.toggle("done"));
+  li.addEventListener("dblclick", () => li.remove());
+
+  document.getElementById("taskList").appendChild(li);
+  document.getElementById("taskInput").value = "";
+});
+</script>
+
+<style>
+.done { text-decoration: line-through; color: gray; }
+</style>
+========================================================================================================================================
+
+3️⃣ Build a Simple Calculator
+
+✔️ Features
+
+Add, subtract, multiply, divide
+
+✔️ Example:
+
+<input id="num1" type="number">
+<input id="num2" type="number">
+<button onclick="calculate('+')">+</button>
+<button onclick="calculate('-')">-</button>
+<button onclick="calculate('*')">*</button>
+<button onclick="calculate('/')">/</button>
+
+<p id="result"></p>
+
+<script>
+function calculate(op){
+  const a = Number(document.getElementById("num1").value);
+  const b = Number(document.getElementById("num2").value);
+  let result;
+
+  switch(op){
+    case "+": result = a + b; break;
+    case "-": result = a - b; break;
+    case "*": result = a * b; break;
+    case "/": result = b === 0 ? "No division by zero!" : a / b;
+  }
+
+  document.getElementById("result").textContent = result;
+}
+</script>
+====================================================================================================================================================
+
+4️⃣ Implement Form Validation with JavaScript
+
+✔️ Example: Email & Password Validation
+
+<form id="form">
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button>Submit</button>
+</form>
+
+<script>
+document.getElementById("form").addEventListener("submit", (e) => {
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("password").value;
+
+  if(!email.includes("@")){
+    alert("Enter valid email!");
+    e.preventDefault();
+  }
+
+  if(pass.length < 6){
+    alert("Password must be 6+ characters!");
+    e.preventDefault();
+  }
+});
+</script>
+==========================================================================================================================================
+5️⃣ Create Image Sliders / Carousels
+
+✔️ Simple Auto-Sliding Carousel
+
+<img id="slider" width="300">
+
+<script>
+const images = ["img1.jpg", "img2.jpg", "img3.jpg"];
+let index = 0;
+
+setInterval(() => {
+  document.getElementById("slider").src = images[index];
+  index = (index + 1) % images.length;
+}, 2000);
+</script>
+=============================================================================================================================================
+6️⃣ Practice with localStorage
+
+✔️ Store Data
+localStorage.setItem("username", "John");
+
+✔️ Retrieve Data
+let user = localStorage.getItem("username");
+console.log(user);
+
+✔️ Remove Data
+localStorage.removeItem("username");
+========================================================================================================================================
+
+🎯 PROJECT:Build an Interactive Task Manager with add, delete, and mark complete functionality
+
+ Interactive Task Manager:
+
+This is a full mini-project combining everything you’ve learned:
+✔ Add tasks
+✔ Delete tasks
+✔ Mark tasks complete
+✔ Save tasks in localStorage
+
+🏗️ Interactive Task Manager – Full Code
+
+📁 index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Task Manager</title>
+<link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>✨ Task Manager</h2>
+
+  <div class="input-area">
+    <input id="taskInput" placeholder="What do you want to do?">
+    <button id="addBtn">Add Task</button>
+  </div>
+
+  <ul id="taskList"></ul>
+</div>
+
+<script src="src/script.js"></script>
+</body>
+</html>
+
+🎨 styles.css
+/* Global page style */
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #4e54c8, #8f94fb);
+  margin: 0;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100vh;
+  color: #fff;
+}
+
+/* Main container */
+.container {
+  background: white;
+  width: 400px;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  color: #333;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Fade animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #4e54c8;
+}
+
+/* Input area */
+.input-area {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  outline: none;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+input:focus {
+  border-color: #4e54c8;
+}
+
+/* Button style */
+button {
+  padding: 10px 18px;
+  background: #4e54c8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #3036a0;
+}
+
+/* Task list */
+ul {
+  padding-left: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f5f5ff;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  border-left: 6px solid #4e54c8;
+}
+
+li:hover {
+  background: #ebebff;
+}
+
+/* Completed tasks */
+li.completed {
+  text-decoration: line-through;
+  color: gray;
+  background: #e6e6e6;
+  border-left-color: gray;
+}
+
+/* Delete button */
+li span {
+  color: red;
+  font-size: 18px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+li span:hover {
+  transform: scale(1.2);
+}
+
+⚙️ script.js
+const taskInput = document.getElementById("taskInput");
+const taskList = document.getElementById("taskList");
+
+// Load tasks from localStorage
+window.onload = loadTasks;
+
+document.getElementById("addBtn").addEventListener("click", addTask);
+
+function addTask() {
+  const taskText = taskInput.value.trim();
+  if (taskText === "") return;
+
+  let task = {
+    text: taskText,
+    completed: false
+  };
+
+  addTaskToHTML(task);
+  saveTask(task);
+
+  taskInput.value = "";
+}
+
+// Add to HTML
+function addTaskToHTML(task) {
+  const li = document.createElement("li");
+  li.textContent = task.text;
+
+  if (task.completed) li.classList.add("completed");
+
+  // Mark complete
+  li.addEventListener("click", () => {
+    li.classList.toggle("completed");
+    updateLocalStorage();
+  });
+
+  // Delete button
+  const del = document.createElement("span");
+  del.textContent = "❌";
+  del.addEventListener("click", (e) => {
+    e.stopPropagation();
+    li.remove();
+    updateLocalStorage();
+  });
+
+  li.appendChild(del);
+  taskList.appendChild(li);
+}
+
+// Save to localStorage
+function saveTask(task) {
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  tasks.push(task);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+// Load tasks
+function loadTasks() {
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  tasks.forEach(task => addTaskToHTML(task));
+}
+
+// Update localStorage
+function updateLocalStorage() {
+  let tasks = [];
+  document.querySelectorAll("#taskList li").forEach(li => {
+    tasks.push({
+      text: li.childNodes[0].textContent,
+      completed: li.classList.contains("completed")
+    });
+  });
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+=============================================================================================================================================
