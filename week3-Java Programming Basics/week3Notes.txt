@@ -1,0 +1,573 @@
+                                                                                  📚 Theory Concepts:
+================================================================================================================================================================================
+
+📚 Java Concepts — Short Definitions + Examples:
+
+1. Java Syntax and Basic Programming Concepts:
+
+✅ Definition:
+
+Java syntax is the set of rules that define how Java code must be written (structure, keywords, braces, semicolons, etc.).
+
+▶ Example:
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello Java!");
+    }
+}
+=================================================================================================================================================================================
+
+2. Object-Oriented Programming (OOP) Principles:
+
+1️⃣ Encapsulation:
+
+Definition:
+
+Wrapping data and methods inside a class and restricting access using private keywords.
+
+Example:
+
+class Person {
+    private String name;
+
+    public void setName(String n) { name = n; }
+    public String getName() { return name; }
+}
+
+2️⃣ Inheritance:
+
+Definition:
+
+A class can inherit properties and methods from another class.
+
+Example:
+
+class Animal {
+    void eat() { System.out.println("Eating"); }
+}
+
+class Dog extends Animal {
+    void bark() { System.out.println("Barking"); }
+}
+
+3️⃣ Polymorphism:
+
+Definition:
+
+Same method name but different behavior depending on the object.
+
+Example:
+
+class Animal {
+    void sound() { System.out.println("Animal sound"); }
+}
+
+class Cat extends Animal {
+    void sound() { System.out.println("Meow"); }
+}
+
+4️⃣ Abstraction:
+
+Definition:
+
+Showing only important details and hiding the internal working using abstract classes or interfaces.
+
+Example:
+
+abstract class Shape {
+    abstract void draw();
+}
+
+class Circle extends Shape {
+    void draw() { System.out.println("Drawing Circle"); }
+}
+==============================================================================================================================================================================
+
+3. Classes, Objects, and Methods
+
+Class:
+
+Definition:
+
+A blueprint or template for creating objects.
+
+Example:
+
+class Car {
+    void drive() { System.out.println("Driving"); }
+}
+
+Object:
+
+Definition:
+
+An instance of a class.
+
+Example:
+
+Car myCar = new Car();
+myCar.drive();
+
+Methods:
+
+Definition:
+
+A block of code that performs a task.
+
+Example:
+
+void greet() {
+    System.out.println("Hello!");
+}
+=======================================================================================================================================================================
+
+4. Data Types and Control Structures
+
+Data Types:
+
+Definition:
+Types of values a variable can store (e.g., numbers, characters, true/false).
+
+Example:
+
+int age = 20;
+double price = 10.5;
+boolean isJavaFun = true;
+
+Control Structures:
+
+Definition:
+
+Statements that control the flow of the program (if, loops, switch).
+
+Examples:
+
+If-else:
+
+if (age > 18) {
+    System.out.println("Adult");
+}
+
+
+For loop:
+
+for(int i = 1; i <= 3; i++) {
+    System.out.println(i);
+}
+
+
+Switch:
+
+switch(day) {
+    case 1: System.out.println("Monday"); break;
+}
+============================================================================================================================================================
+5. Arrays and Collections Introduction
+
+Array:
+
+Definition:
+
+A fixed-size container that stores multiple values of the same data type.
+
+Example:
+
+int[] nums = {1, 2, 3};
+System.out.println(nums[0]); // 1
+
+ArrayList (Collection)
+
+Definition:
+
+A resizable array from Java Collections Framework.
+
+Example:
+
+ArrayList<String> list = new ArrayList<>();
+list.add("Apple");
+list.add("Banana");
+
+HashMap (Collection):
+
+Definition:
+
+Stores data in key–value pairs.
+
+Example:
+
+HashMap<Integer, String> map = new HashMap<>();
+map.put(1, "One");
+map.put(2, "Two");
+==========================================================================================================================================================================
+6. Basic Input / Output Operations
+
+Input
+
+Definition:
+
+Reading data from the user using Scanner.
+
+Example:
+
+Scanner sc = new Scanner(System.in);
+String name = sc.nextLine();
+
+Output
+
+Definition:
+
+Displaying data to the screen.
+
+Example:
+
+System.out.println("Hello World");
+
+
+
+
+===============================================================================================================================================================================
+										🛠️ Hands-On Practice:
+=================================================================================================================================================================================
+✅ 1. Simple Java Program with Classes
+
+Program: Class + Object 
+
+Example:
+
+class Car {
+    String brand;
+    int year;
+
+    void display() {
+        System.out.println("Brand: " + brand);
+        System.out.println("Year: " + year);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Car c = new Car();
+        c.brand = "Toyota";
+        c.year = 2020;
+
+        c.display();
+    }
+}
+====================================================================================================================================================================
+✅ 2. Student Management System (Very Simple Version)
+
+Features:
+
+✔ Add student
+✔ Display students
+
+import java.util.ArrayList;
+
+class Student {
+    String name;
+    int roll;
+
+    Student(String name, int roll) {
+        this.name = name;
+        this.roll = roll;
+    }
+}
+
+public class StudentManagement {
+    public static void main(String[] args) {
+        ArrayList<Student> students = new ArrayList<>();
+
+        students.add(new Student("John", 1));
+        students.add(new Student("Emma", 2));
+
+        System.out.println("Student List:");
+        for (Student s : students) {
+            System.out.println(s.roll + " - " + s.name);
+        }
+    }
+}
+===========================================================================================================================================================================
+✅ 3. Basic Banking Operations (Deposit, Withdraw, Check Balance)
+
+Program:
+
+class BankAccount {
+    double balance = 0;
+
+    void deposit(double amount) {
+        balance += amount;
+        System.out.println("Deposited: " + amount);
+    }
+
+    void withdraw(double amount) {
+        if (amount <= balance) {
+            balance -= amount;
+            System.out.println("Withdrawn: " + amount);
+        } else {
+            System.out.println("Insufficient balance");
+        }
+    }
+
+    void checkBalance() {
+        System.out.println("Current Balance: " + balance);
+    }
+}
+
+public class Bank {
+    public static void main(String[] args) {
+        BankAccount acc = new BankAccount();
+
+        acc.deposit(500);
+        acc.withdraw(200);
+        acc.checkBalance();
+    }
+}
+=====================================================================================================================================================================
+✅ 4. Practice with Arrays and ArrayList
+
+Array Example:
+
+public class ArrayExample {
+    public static void main(String[] args) {
+        int[] numbers = {10, 20, 30, 40};
+
+        for (int n : numbers) {
+            System.out.println(n);
+        }
+    }
+}
+
+ArrayList Example:
+
+import java.util.ArrayList;
+
+public class ArrayListExample {
+    public static void main(String[] args) {
+        ArrayList<String> fruits = new ArrayList<>();
+
+        fruits.add("Apple");
+        fruits.add("Banana");
+        fruits.add("Orange");
+
+        System.out.println("Fruits List:");
+        for (String f : fruits) {
+            System.out.println(f);
+        }
+    }
+}
+===========================================================================================================================================================
+✅ 5. Console-Based Application (Menu System)
+
+Program: Simple Menu App
+
+import java.util.Scanner;
+
+public class MenuApp {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n--- MENU ---");
+            System.out.println("1. Say Hello");
+            System.out.println("2. Add Numbers");
+            System.out.println("0. Exit");
+            System.out.print("Enter choice: ");
+
+            choice = sc.nextInt();
+
+            if (choice == 1) {
+                System.out.println("Hello User!");
+            } else if (choice == 2) {
+                System.out.print("Enter two numbers: ");
+                int a = sc.nextInt();
+                int b = sc.nextInt();
+                System.out.println("Sum = " + (a + b));
+            } else if (choice == 0) {
+                System.out.println("Goodbye!");
+            }
+
+        } while (choice != 0);
+    }
+}
+=================================================================================================================================================================================
+🎯 Project:
+
+Build a Console-Based Library Management System with book tracking and member management
+
+📚 Console-Based Library Management System (Java)
+
+Features included:
+
+Add books
+
+View books
+
+Register members
+
+View members
+
+Borrow a book
+
+Return a book
+
+✅ FULL PROGRAM
+
+import import java.util.ArrayList;
+java.util.Scanner;
+
+// ---------------------- Book Class ------------------------
+class Book {
+    int id;
+    String title;
+    boolean isBorrowed;
+
+    Book(int id, String title) {
+        this.id = id;
+        this.title = title;
+        this.isBorrowed = false;
+    }
+}
+
+// ---------------------- Member Class -----------------------
+class Member {
+    int memberId;
+    String name;
+
+    Member(int memberId, String name) {
+        this.memberId = memberId;
+        this.name = name;
+    }
+}
+
+// ---------------------- Main Library System ----------------
+public class LibrarySystem {
+
+    static ArrayList<Book> books = new ArrayList<>();
+    static ArrayList<Member> members = new ArrayList<>();
+
+    static Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) {
+
+        int choice;
+        do {
+            System.out.println("\n===== LIBRARY MANAGEMENT SYSTEM =====");
+            System.out.println("1. Add Book");
+            System.out.println("2. View Books");
+            System.out.println("3. Add Member");
+            System.out.println("4. View Members");
+            System.out.println("5. Borrow Book");
+            System.out.println("6. Return Book");
+            System.out.println("0. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+
+            switch (choice) {
+                case 1: addBook(); break;
+                case 2: viewBooks(); break;
+                case 3: addMember(); break;
+                case 4: viewMembers(); break;
+                case 5: borrowBook(); break;
+                case 6: returnBook(); break;
+                case 0: System.out.println("Exiting..."); break;
+                default: System.out.println("Invalid Choice!");
+            }
+        } while (choice != 0);
+    }
+
+    // ---------------- Add Book ----------------
+    static void addBook() {
+        System.out.print("Enter Book ID: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print("Enter Book Title: ");
+        String title = sc.nextLine();
+
+        books.add(new Book(id, title));
+        System.out.println("Book Added Successfully!");
+    }
+
+    // ---------------- View Books ----------------
+    static void viewBooks() {
+        if (books.isEmpty()) {
+            System.out.println("No Books Available.");
+            return;
+        }
+
+        System.out.println("\n--- Book List ---");
+        for (Book b : books) {
+            System.out.println("ID: " + b.id + " | Title: " + b.title +
+                    " | Status: " + (b.isBorrowed ? "Borrowed" : "Available"));
+        }
+    }
+
+    // ---------------- Add Member ----------------
+    static void addMember() {
+        System.out.print("Enter Member ID: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print("Enter Member Name: ");
+        String name = sc.nextLine();
+
+        members.add(new Member(id, name));
+        System.out.println("Member Added Successfully!");
+    }
+
+    // ---------------- View Members ----------------
+    static void viewMembers() {
+        if (members.isEmpty()) {
+            System.out.println("No Members Registered.");
+            return;
+        }
+
+        System.out.println("\n--- Member List ---");
+        for (Member m : members) {
+            System.out.println("ID: " + m.memberId + " | Name: " + m.name);
+        }
+    }
+
+    // ---------------- Borrow Book ----------------
+    static void borrowBook() {
+        System.out.print("Enter Book ID to Borrow: ");
+        int id = sc.nextInt();
+
+        for (Book b : books) {
+            if (b.id == id) {
+                if (!b.isBorrowed) {
+                    b.isBorrowed = true;
+                    System.out.println("Book Borrowed Successfully!");
+                } else {
+                    System.out.println("Book Already Borrowed.");
+                }
+                return;
+            }
+        }
+
+        System.out.println("Book Not Found!");
+    }
+
+    // ---------------- Return Book ----------------
+    static void returnBook() {
+        System.out.print("Enter Book ID to Return: ");
+        int id = sc.nextInt();
+
+        for (Book b : books) {
+            if (b.id == id) {
+                if (b.isBorrowed) {
+                    b.isBorrowed = false;
+                    System.out.println("Book Returned Successfully!");
+                } else {
+                    System.out.println("Book was not borrowed.");
+                }
+                return;
+            }
+        }
+
+        System.out.println("Book Not Found!");
+    }
+}
+==========================================================================================================================================================================
