@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Portfolio</title>
+
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <nav>
+      <div class="logo">MyPortfolio</div>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>DHANALAKSHMI KONDURU</h1>
+    <p>Full Stack Developer passionate about building dynamic and responsive web applications.</p>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about">
+    <h2>About Me</h2>
+    <p>
+      I’m a passionate Full Stack Web Developer who loves building dynamic and responsive web applications.
+      I specialize in both front-end and back-end development using modern web technologies.
+    </p>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <h2>Projects</h2>
+    <div class="projects-grid">
+      <article class="project-card">
+        <h3>Banking Project</h3>
+        <p>
+          A Banking System Website using HTML, CSS, and JavaScript that allows users to create accounts,
+          view balances, and perform transactions.
+        </p>
+      </article>
+
+      <article class="project-card">
+        <h3>Online Shopping Website</h3>
+        <p>
+          An e-commerce website that allows users to browse products, view details, and add items to cart.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <h2>Skills</h2>
+    <div class="skills-list">
+      <div class="skill">HTML5</div>
+      <div class="skill">CSS3</div>
+      <div class="skill">JavaScript</div>
+      <div class="skill">Java</div>
+      <div class="skill">MySQL</div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <h2>Contact Me</h2>
+    <form>
+      <label for="name">Name</label>
+      <input id="name" type="text" required />
+
+      <label for="email">Email</label>
+      <input id="email" type="email" required />
+
+      <label for="message">Message</label>
+      <textarea id="message" rows="5" required></textarea>
+
+      <button type="submit">Send Message</button>
+    </form>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    MyPortfolio © 2025. All rights reserved.
+  </footer>
+
+  <!-- JS -->
+  <script src="js/navigation.js"></script>
+</body>
+</html>
