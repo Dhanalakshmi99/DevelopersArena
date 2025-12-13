@@ -413,162 +413,333 @@ Borrow a book
 
 Return a book
 
-✅ FULL PROGRAM
 
+1.Book.java
+
+package library;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+
+public class Book implements Serializable {
+
+    private String isbn;
+    private String title;
+    private String author;
+    private int year;
+    private boolean available;
+    private String borrowedBy;
+    private LocalDate dueDate;
+
+    public Book(String isbn, String title, String author, int year) {
+        this.isbn = isbn;
+        this.title = title;
+        this.author = author;
+        this.year = year;
+        this.available = true;
+    }
+
+    public String getIsbn() { return isbn; }
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    public int getYear() { return year; }
+    public boolean isAvailable() { return available; }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+
+    public String getBorrowedBy() { return borrowedBy; }
+    public void setBorrowedBy(String borrowedBy) {
+        this.borrowedBy = borrowedBy;
+    }
+
+    public LocalDate getDueDate() { return dueDate; }
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public boolean isOverdue() {
+        return dueDate != null && LocalDate.now().isAfter(dueDate);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "ISBN: %s | Title: %s | Author: %s | Year: %d | %s",
+            isbn, title, author, year,
+            available ? "Available" : "Borrowed by: " + borrowedBy
+        );
+    }
+}
+
+2.Member.java
+package library;
+
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+
+public class Member implements Serializable {
+
+    private String id;
+    private String name;
+    private List<String> borrowedBooks;
+
+    public Member(String id, String name) {
+        this.id = id;
+        this.name = name;
+        this.borrowedBooks = new ArrayList<>();
+    }
+
+    public String getId() { return id; }
+    public String getName() { return name; }
+
+    public List<String> getBorrowedBooks() {
+        return borrowedBooks;
+    }
+
+    public void borrowBook(String isbn) {
+        borrowedBooks.add(isbn);
+    }
+
+    public void returnBook(String isbn) {
+        borrowedBooks.remove(isbn);
+    }
+
+    @Override
+    public String toString() {
+        return "Member ID: " + id + " | Name: " + name +
+               " | Borrowed Books: " + borrowedBooks.size();
+    }
+}
+
+
+3.Main.java
+
+package library;
+
 import java.util.Scanner;
 
-// ---------------------- Book Class ------------------------
-class Book {
-    int id;
-    String title;
-    boolean isBorrowed;
-
-    Book(int id, String title) {
-        this.id = id;
-        this.title = title;
-        this.isBorrowed = false;
-    }
-}
-
-// ---------------------- Member Class -----------------------
-class Member {
-    int memberId;
-    String name;
-
-    Member(int memberId, String name) {
-        this.memberId = memberId;
-        this.name = name;
-    }
-}
-
-// ---------------------- Main Library System ----------------
-public class LibrarySystem {
-
-    static ArrayList<Book> books = new ArrayList<>();
-    static ArrayList<Member> members = new ArrayList<>();
-
-    static Scanner sc = new Scanner(System.in);
+public class Main {
 
     public static void main(String[] args) {
+        Library library = new Library();
+        Scanner sc = new Scanner(System.in);
 
-        int choice;
-        do {
-            System.out.println("\n===== LIBRARY MANAGEMENT SYSTEM =====");
+        while (true) {
+            System.out.println("\n=== LIBRARY MANAGEMENT SYSTEM ===");
             System.out.println("1. Add Book");
             System.out.println("2. View Books");
-            System.out.println("3. Add Member");
-            System.out.println("4. View Members");
+            System.out.println("3. Search Books");
+            System.out.println("4. Register Member");
             System.out.println("5. Borrow Book");
-            System.out.println("6. Return Book");
-            System.out.println("0. Exit");
+            System.out.println("6. View Statistics");
+            System.out.println("7. Exit");
             System.out.print("Enter choice: ");
-            choice = sc.nextInt();
+
+            int choice = sc.nextInt();
+            sc.nextLine();
 
             switch (choice) {
-                case 1: addBook(); break;
-                case 2: viewBooks(); break;
-                case 3: addMember(); break;
-                case 4: viewMembers(); break;
-                case 5: borrowBook(); break;
-                case 6: returnBook(); break;
-                case 0: System.out.println("Exiting..."); break;
-                default: System.out.println("Invalid Choice!");
-            }
-        } while (choice != 0);
-    }
-
-    // ---------------- Add Book ----------------
-    static void addBook() {
-        System.out.print("Enter Book ID: ");
-        int id = sc.nextInt();
-        sc.nextLine();
-
-        System.out.print("Enter Book Title: ");
-        String title = sc.nextLine();
-
-        books.add(new Book(id, title));
-        System.out.println("Book Added Successfully!");
-    }
-
-    // ---------------- View Books ----------------
-    static void viewBooks() {
-        if (books.isEmpty()) {
-            System.out.println("No Books Available.");
-            return;
-        }
-
-        System.out.println("\n--- Book List ---");
-        for (Book b : books) {
-            System.out.println("ID: " + b.id + " | Title: " + b.title +
-                    " | Status: " + (b.isBorrowed ? "Borrowed" : "Available"));
-        }
-    }
-
-    // ---------------- Add Member ----------------
-    static void addMember() {
-        System.out.print("Enter Member ID: ");
-        int id = sc.nextInt();
-        sc.nextLine();
-
-        System.out.print("Enter Member Name: ");
-        String name = sc.nextLine();
-
-        members.add(new Member(id, name));
-        System.out.println("Member Added Successfully!");
-    }
-
-    // ---------------- View Members ----------------
-    static void viewMembers() {
-        if (members.isEmpty()) {
-            System.out.println("No Members Registered.");
-            return;
-        }
-
-        System.out.println("\n--- Member List ---");
-        for (Member m : members) {
-            System.out.println("ID: " + m.memberId + " | Name: " + m.name);
-        }
-    }
-
-    // ---------------- Borrow Book ----------------
-    static void borrowBook() {
-        System.out.print("Enter Book ID to Borrow: ");
-        int id = sc.nextInt();
-
-        for (Book b : books) {
-            if (b.id == id) {
-                if (!b.isBorrowed) {
-                    b.isBorrowed = true;
-                    System.out.println("Book Borrowed Successfully!");
-                } else {
-                    System.out.println("Book Already Borrowed.");
+                case 1 -> {
+                    System.out.print("ISBN: ");
+                    String isbn = sc.nextLine();
+                    System.out.print("Title: ");
+                    String title = sc.nextLine();
+                    System.out.print("Author: ");
+                    String author = sc.nextLine();
+                    System.out.print("Year: ");
+                    int year = sc.nextInt();
+                    library.addBook(new Book(isbn, title, author, year));
                 }
-                return;
-            }
-        }
-
-        System.out.println("Book Not Found!");
-    }
-
-    // ---------------- Return Book ----------------
-    static void returnBook() {
-        System.out.print("Enter Book ID to Return: ");
-        int id = sc.nextInt();
-
-        for (Book b : books) {
-            if (b.id == id) {
-                if (b.isBorrowed) {
-                    b.isBorrowed = false;
-                    System.out.println("Book Returned Successfully!");
-                } else {
-                    System.out.println("Book was not borrowed.");
+                case 2 -> library.displayBooks();
+                case 3 -> {
+                    System.out.print("Search keyword: ");
+                    library.searchBooks(sc.nextLine())
+                           .forEach(System.out::println);
                 }
-                return;
+                case 4 -> {
+                    System.out.print("Member ID: ");
+                    String id = sc.nextLine();
+                    System.out.print("Name: ");
+                    String name = sc.nextLine();
+                    library.registerMember(new Member(id, name));
+                }
+                case 5 -> {
+                    System.out.print("ISBN: ");
+                    String isbn = sc.nextLine();
+                    System.out.print("Member ID: ");
+                    String id = sc.nextLine();
+                    library.borrowBook(isbn, id);
+                }
+                case 6 -> library.displayStatistics();
+                case 7 -> {
+                    System.out.println("Exiting...");
+                    return;
+                }
+                default -> System.out.println("Invalid choice!");
             }
         }
-
-        System.out.println("Book Not Found!");
     }
 }
+
+4.FileHandler.java
+
+package library;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class FileHandler {
+
+    private static final String BOOK_FILE = "data/books.txt";
+    private static final String MEMBER_FILE = "data/members.txt";
+
+    public void saveBooks(List<Book> books) {
+        try (ObjectOutputStream oos =
+                     new ObjectOutputStream(new FileOutputStream(BOOK_FILE))) {
+            oos.writeObject(books);
+        } catch (IOException e) {
+            System.out.println("Error saving books: " + e.getMessage());
+        }
+    }
+
+    public List<Book> loadBooks() {
+        try (ObjectInputStream ois =
+                     new ObjectInputStream(new FileInputStream(BOOK_FILE))) {
+            return (List<Book>) ois.readObject();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public void saveMembers(List<Member> members) {
+        try (ObjectOutputStream oos =
+                     new ObjectOutputStream(new FileOutputStream(MEMBER_FILE))) {
+            oos.writeObject(members);
+        } catch (IOException e) {
+            System.out.println("Error saving members: " + e.getMessage());
+        }
+    }
+
+    public List<Member> loadMembers() {
+        try (ObjectInputStream ois =
+                     new ObjectInputStream(new FileInputStream(MEMBER_FILE))) {
+            return (List<Member>) ois.readObject();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+}
+
+5.Library.java
+
+package library;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class Library {
+
+    private List<Book> books;
+    private List<Member> members;
+    private FileHandler fileHandler;
+
+    public Library() {
+        fileHandler = new FileHandler();
+        books = fileHandler.loadBooks();
+        members = fileHandler.loadMembers();
+    }
+
+    public void addBook(Book book) {
+        books.add(book);
+        fileHandler.saveBooks(books);
+        System.out.println("Book added successfully!");
+    }
+
+    public void registerMember(Member member) {
+        members.add(member);
+        fileHandler.saveMembers(members);
+        System.out.println("Member registered successfully!");
+    }
+
+    public Book findBook(String isbn) {
+        return books.stream()
+                .filter(b -> b.getIsbn().equals(isbn))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Member findMember(String id) {
+        return members.stream()
+                .filter(m -> m.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void borrowBook(String isbn, String memberId) {
+        Book book = findBook(isbn);
+        Member member = findMember(memberId);
+
+        if (book == null || member == null || !book.isAvailable()) {
+            System.out.println("Borrowing failed.");
+            return;
+        }
+
+        book.setAvailable(false);
+        book.setBorrowedBy(memberId);
+        book.setDueDate(LocalDate.now().plusWeeks(2));
+        member.borrowBook(isbn);
+
+        fileHandler.saveBooks(books);
+        fileHandler.saveMembers(members);
+
+        System.out.println("Book borrowed. Due date: " + book.getDueDate());
+    }
+
+    public void displayBooks() {
+        books.forEach(System.out::println);
+    }
+
+    public List<Book> searchBooks(String keyword) {
+        return books.stream()
+                .filter(b -> b.getTitle().toLowerCase().contains(keyword.toLowerCase())
+                        || b.getAuthor().toLowerCase().contains(keyword.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public void displayStatistics() {
+        long available = books.stream().filter(Book::isAvailable).count();
+        long overdue = books.stream().filter(Book::isOverdue).count();
+
+        System.out.println("\n=== LIBRARY STATISTICS ===");
+        System.out.println("Total Books: " + books.size());
+        System.out.println("Available Books: " + available);
+        System.out.println("Borrowed Books: " + (books.size() - available));
+        System.out.println("Members: " + members.size());
+        System.out.println("Overdue Books: " + overdue);
+    }
+}
+
 ========================================================================================================================================================================
+commands to create floders in cmd:
+
+mkdir week3-library-system
+cd week3-library-system
+mkdir src
+mkdir src\main
+mkdir src\main\java
+mkdir src\main\java\library
+
+commands to run the program in cmd:
+
+navigate to   cd path\to\week3-library-system
+
+javac -d bin src\main\java\library\*.java
+java -cp bin library.Main
+=====================================================================================================================================================================
+
