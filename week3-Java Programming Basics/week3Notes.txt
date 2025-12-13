@@ -734,6 +734,9 @@ mkdir src
 mkdir src\main
 mkdir src\main\java
 mkdir src\main\java\library
+mkdir data
+type nul > data\books.txt
+type nul > data\members.txt
 
 commands to run the program in cmd:
 
