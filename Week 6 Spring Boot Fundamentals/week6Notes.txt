@@ -1,0 +1,802 @@
+							📚 Theory Concepts:
+===================================================================================================================================
+1. Spring Framework Overview
+Understanding the Spring Ecosystem & Architecture
+What is Spring?
+
+Spring is a Java-based framework that simplifies enterprise application development by providing:
+
+Dependency Injection (DI)
+
+Aspect-Oriented Programming (AOP)
+
+Transaction management
+
+Web development support
+
+Spring Ecosystem (Major Modules)
+Module	Purpose
+Spring Core	IoC container, DI
+Spring MVC	Web applications
+Spring Boot	Auto-configuration, rapid development
+Spring Data	Database access
+Spring Security	Authentication & authorization
+Spring Cloud	Microservices
+Spring AOP	Cross-cutting concerns
+Spring Architecture (High-Level)
+Controller → Service → Repository → Database
+
+
+Spring manages objects (beans) and their lifecycle via the IoC Container.
+
+2. Spring Boot Essentials
+Auto-Configuration, Starters & Convention over Configuration
+What is Spring Boot?
+
+Spring Boot eliminates boilerplate configuration and lets you build applications quickly.
+
+Auto-Configuration
+
+Spring Boot automatically configures beans based on:
+
+Classpath dependencies
+
+Application properties
+
+📌 Example:
+If spring-boot-starter-web is present, Spring auto-configures:
+
+DispatcherServlet
+
+Embedded Tomcat
+
+JSON converters
+
+Starters
+
+Starters are dependency bundles.
+
+📌 Example:
+
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+
+Includes:
+
+Spring MVC
+
+Jackson
+
+Tomcat
+
+Convention Over Configuration
+
+Spring Boot provides default behavior so you write less config.
+
+📌 Example:
+
+application.properties auto-loaded
+
+/static folder serves static content
+
+Main class auto-detected
+
+3. Dependency Injection (DI)
+Inversion of Control (IoC) Container & Bean Management
+What is IoC?
+
+Instead of creating objects manually, Spring creates and injects them.
+
+Example Without DI
+Car car = new Car(new Engine());
+
+Example With DI
+@Component
+class Engine {}
+
+@Component
+class Car {
+    @Autowired
+    private Engine engine;
+}
+
+
+Spring injects Engine automatically.
+
+Common Bean Annotations
+Annotation	Purpose
+@Component	Generic bean
+@Service	Business logic
+@Repository	Database layer
+@Controller	MVC controller
+@RestController	REST API
+Bean Lifecycle
+
+Bean creation
+
+Dependency injection
+
+Initialization
+
+Usage
+
+Destruction
+
+4. Spring MVC Pattern
+Model–View–Controller Architecture
+MVC Components
+Component	Role
+Model	Data
+View	UI (HTML, JSP, Thymeleaf)
+Controller	Handles requests
+Request Flow
+Client → DispatcherServlet → Controller → Service → Repository
+
+Example Controller
+@Controller
+public class HomeController {
+
+    @GetMapping("/home")
+    public String home(Model model) {
+        model.addAttribute("message", "Welcome to Spring MVC");
+        return "home";
+    }
+}
+
+5. RESTful Web Services
+REST Principles, HTTP Methods & Status Codes
+REST Principles
+
+Stateless
+
+Resource-based
+
+Uses HTTP
+
+JSON/XML responses
+
+HTTP Methods
+Method	Purpose
+GET	Read data
+POST	Create
+PUT	Update
+DELETE	Delete
+REST Controller Example
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Long id) {
+        return new User(id, "John");
+    }
+
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+}
+
+Common HTTP Status Codes
+Code	Meaning
+200	OK
+201	Created
+400	Bad Request
+404	Not Found
+500	Server Error
+6. Spring Data JPA Basics
+ORM with JPA & Hibernate
+What is JPA?
+
+JPA is a Java specification for ORM.
+Hibernate is the implementation.
+
+Entity Example
+@Entity
+public class User {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String name;
+}
+
+Repository Interface
+public interface UserRepository extends JpaRepository<User, Long> {
+}
+
+
+Spring automatically provides:
+
+save()
+
+findById()
+
+delete()
+
+Application Properties
+spring.datasource.url=jdbc:mysql://localhost:3306/testdb
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+7. Spring Boot Project Structure
+Best Practices & Example
+Standard Structure
+src/main/java
+ └── com.example.demo
+     ├── DemoApplication.java
+     ├── controller
+     │    └── UserController.java
+     ├── service
+     │    └── UserService.java
+     ├── repository
+     │    └── UserRepository.java
+     ├── model
+     │    └── User.java
+
+src/main/resources
+ ├── application.properties
+ ├── static/
+ └── templates/
+
+Why This Structure?
+
+Separation of concerns
+
+Easy maintenance
+
+Scalable architecture
+
+Industry standard
+
+Summary Diagram
+Controller → Service → Repository → Database
+        ↑
+      REST API
+===================================================================================================================================
+					🛠️ Hands-On Practice:
+==================================================================================================================================
+1. Setting up a Spring Boot Project (Spring Initializr)
+What is Spring Initializr?
+
+Spring Initializr is a tool to bootstrap Spring Boot applications quickly.
+
+Steps (Web UI)
+
+Go to Spring Initializr
+
+Choose:
+
+Project: Maven
+
+Language: Java
+
+Spring Boot Version: default
+
+Project Metadata:
+
+Group: com.example
+
+Artifact: demo
+
+Dependencies:
+
+Spring Web
+
+Spring Data JPA
+
+H2 / MySQL Driver
+
+Lombok (optional)
+
+Click Generate
+
+Project Structure
+demo
+ ├── src/main/java/com/example/demo
+ │    ├── DemoApplication.java
+ │    ├── controller
+ │    ├── service
+ │    ├── repository
+ │    └── model
+ └── src/main/resources
+      └── application.properties
+
+2. Creating Basic REST Endpoints (@RestController)
+@RestController
+
+Combines @Controller + @ResponseBody
+
+Returns JSON directly
+
+Example
+@RestController
+@RequestMapping("/api/hello")
+public class HelloController {
+
+    @GetMapping
+    public String hello() {
+        return "Hello Spring Boot!";
+    }
+}
+
+Test in Browser/Postman
+GET http://localhost:8080/api/hello
+
+3. Implementing CRUD Operations
+Resource: Employee
+Entity Class
+@Entity
+public class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String role;
+
+    // getters and setters
+}
+
+Repository
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+}
+
+Service Layer
+@Service
+public class EmployeeService {
+
+    @Autowired
+    private EmployeeRepository repository;
+
+    public Employee save(Employee employee) {
+        return repository.save(employee);
+    }
+
+    public List<Employee> findAll() {
+        return repository.findAll();
+    }
+
+    public Employee findById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
+    public void delete(Long id) {
+        repository.deleteById(id);
+    }
+}
+
+REST Controller (CRUD)
+@RestController
+@RequestMapping("/api/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeService service;
+
+    @PostMapping
+    public Employee create(@RequestBody Employee employee) {
+        return service.save(employee);
+    }
+
+    @GetMapping
+    public List<Employee> getAll() {
+        return service.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Employee getById(@PathVariable Long id) {
+        return service.findById(id);
+    }
+
+    @PutMapping("/{id}")
+    public Employee update(@PathVariable Long id, @RequestBody Employee employee) {
+        employee.setId(id);
+        return service.save(employee);
+    }
+
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Long id) {
+        service.delete(id);
+        return "Employee deleted";
+    }
+}
+
+4. application.properties (Multiple Environments)
+Default (application.properties)
+spring.profiles.active=dev
+
+application-dev.properties
+server.port=8080
+
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driver-class-name=org.h2.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+application-prod.properties
+server.port=9090
+
+spring.datasource.url=jdbc:mysql://localhost:3306/proddb
+spring.datasource.username=root
+spring.datasource.password=pass
+
+spring.jpa.hibernate.ddl-auto=validate
+
+Activate Profile
+java -jar demo.jar --spring.profiles.active=prod
+
+5. JPA Entities and Repositories (Notes)
+Key JPA Annotations
+Annotation	Purpose
+@Entity	Maps class to DB table
+@Id	Primary key
+@GeneratedValue	Auto ID
+@Column	Column mapping
+@Table	Table name
+Custom Query Example
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+    List<Employee> findByRole(String role);
+}
+
+6. Testing APIs (Postman & curl)
+Using Postman
+Create Employee
+
+Method: POST
+
+URL: http://localhost:8080/api/employees
+
+Body (JSON):
+
+{
+  "name": "John",
+  "role": "Developer"
+}
+
+Get All Employees
+GET http://localhost:8080/api/employees
+
+Delete Employee
+DELETE http://localhost:8080/api/employees/1
+
+Using curl
+Create
+curl -X POST http://localhost:8080/api/employees \
+-H "Content-Type: application/json" \
+-d '{"name":"Alice","role":"Tester"}'
+
+Get All
+curl http://localhost:8080/api/employees
+
+Delete
+curl -X DELETE http://localhost:8080/api/employees/1
+
+7. Logging with SLF4J & Logback
+Why Logging?
+
+Debugging
+
+Monitoring
+
+Auditing
+
+SLF4J Logger Example
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@RestController
+public class LogController {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(LogController.class);
+
+    @GetMapping("/log")
+    public String logExample() {
+        logger.info("INFO log");
+        logger.debug("DEBUG log");
+        logger.error("ERROR log");
+        return "Logging done";
+    }
+}
+
+Log Levels
+Level	Usage
+ERROR	Critical failure
+WARN	Warning
+INFO	Normal flow
+DEBUG	Development
+TRACE	Detailed
+application.properties (Logging)
+logging.level.root=INFO
+logging.level.com.example.demo=DEBUG
+logging.file.name=app.log
+
+===================================================================================================================================
+
+🎯 Project: Blog Management REST API
+Build a comprehensive RESTful API for a blog management system using Spring Boot. Implement CRUD operations for blog posts, categories, and comments with proper error handling and validation.
+
+
+===============================================================================================================================
+1️⃣ Unit Tests for Services
+
+We test business logic in the service layer using JUnit 5 and Mockito.
+
+Example: PostServiceTest.java
+
+package com.blogapi.service;
+
+import com.blogapi.exception.ResourceNotFoundException;
+import com.blogapi.model.dto.PostRequest;
+import com.blogapi.model.dto.PostResponse;
+import com.blogapi.model.entity.Category;
+import com.blogapi.model.entity.Post;
+import com.blogapi.repository.CategoryRepository;
+import com.blogapi.repository.PostRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.*;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class PostServiceTest {
+
+    @Mock
+    private PostRepository postRepository;
+
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @InjectMocks
+    private PostService postService;
+
+    private Post post;
+    private Category category;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        category = new Category();
+        category.setId(1L);
+        category.setName("Technology");
+
+        post = new Post();
+        post.setId(1L);
+        post.setTitle("Test Post");
+        post.setContent("Content");
+        post.setAuthor("John Doe");
+        post.setCategory(category);
+        post.setCreatedAt(LocalDateTime.now());
+        post.setUpdatedAt(LocalDateTime.now());
+    }
+
+    @Test
+    void testGetPostById_Success() {
+        when(postRepository.findById(1L)).thenReturn(Optional.of(post));
+
+        PostResponse response = postService.getPostById(1L);
+
+        assertNotNull(response);
+        assertEquals("Test Post", response.getTitle());
+    }
+
+    @Test
+    void testGetPostById_NotFound() {
+        when(postRepository.findById(2L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> postService.getPostById(2L));
+    }
+
+    @Test
+    void testCreatePost_Success() {
+        PostRequest request = new PostRequest();
+        request.setTitle("New Post");
+        request.setContent("New Content");
+        request.setAuthor("John");
+        request.setCategoryId(1L);
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(postRepository.save(any(Post.class))).thenReturn(post);
+
+        PostResponse response = postService.createPost(request);
+
+        assertNotNull(response);
+        assertEquals("Test Post", response.getTitle());
+    }
+
+    @Test
+    void testGetAllPosts() {
+        Page<Post> page = new PageImpl<>(List.of(post));
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+
+        when(postRepository.findAll(pageable)).thenReturn(page);
+
+        Page<PostResponse> result = postService.getAllPosts(pageable);
+
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Test Post", result.getContent().get(0).getTitle());
+    }
+}
+
+
+✅ Notes:
+
+Use @Mock for repositories.
+
+Use @InjectMocks to inject mocks into the service under test.
+
+Test both success and failure cases.
+
+2️⃣ Integration Tests for Controllers
+
+Integration tests check HTTP requests/responses using MockMvc.
+
+Example: PostControllerTest.java
+
+package com.blogapi.controller;
+
+import com.blogapi.model.dto.PostRequest;
+import com.blogapi.model.entity.Category;
+import com.blogapi.service.PostService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(PostController.class)
+class PostControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private PostService postService;
+
+    private PostRequest postRequest;
+
+    @BeforeEach
+    void setUp() {
+        postRequest = new PostRequest();
+        postRequest.setTitle("Integration Test");
+        postRequest.setContent("Content");
+        postRequest.setAuthor("John Doe");
+        postRequest.setCategoryId(1L);
+    }
+
+    @Test
+    void testCreatePost() throws Exception {
+        Mockito.when(postService.createPost(Mockito.any(PostRequest.class))).thenReturn(null);
+
+        mockMvc.perform(post("/api/posts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(postRequest)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testGetAllPosts() throws Exception {
+        mockMvc.perform(get("/api/posts"))
+                .andExpect(status().isOk());
+    }
+}
+
+
+✅ Notes:
+
+Use @WebMvcTest for controller testing.
+
+Use MockMvc to simulate HTTP requests.
+
+Mock service layer to isolate controller behavior.
+
+3️⃣ Postman Collection for API Testing
+
+Create a JSON file (postman_collection.json) like:
+
+{
+  "info": {
+    "name": "Blog API",
+    "_postman_id": "12345678-abcd-efgh-ijkl-1234567890ab",
+    "description": "Postman collection for Blog Management API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Posts",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/posts",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "posts"]
+        }
+      }
+    },
+    {
+      "name": "Create Post",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"New Post\",\n  \"content\": \"Spring Boot Content\",\n  \"author\": \"John\",\n  \"categoryId\": 1\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/posts",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "posts"]
+        }
+      }
+    }
+  ]
+}
+
+
+You can import this into Postman and test all endpoints.
+
+4️⃣ OpenAPI / Swagger Documentation
+
+Add dependency in pom.xml:
+
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.1.0</version>
+</dependency>
+
+
+SwaggerConfig.java
+
+package com.blogapi.config;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SwaggerConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Blog Management API")
+                        .version("1.0")
+                        .description("REST API for managing blog posts, categories, and comments"));
+    }
+}
+
+
+Access UI: http://localhost:8080/swagger-ui.html
+==================================================================================================================
