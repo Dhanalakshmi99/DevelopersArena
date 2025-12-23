@@ -1,0 +1,559 @@
+								📚 Theory Concepts:
+==========================================================================================================================
+1. Relational Database Fundamentals
+Table
+
+Definition:
+A table stores data about one type of entity (e.g., users, orders).
+
+Example:
+users table
+
+id	name	email
+1	Alice	alice@test.com
+Row
+
+Definition:
+A single record in a table.
+
+Example:
+(1, "Alice", "alice@test.com") is one row in users.
+
+Column
+
+Definition:
+A field that defines a type of data stored in a table.
+
+Example:
+email column stores email addresses.
+
+Relationship
+
+Definition:
+A connection between tables using primary keys and foreign keys.
+
+Example:
+orders.user_id → users.id
+
+2. JPA & Hibernate (ORM)
+Definition
+
+JPA (Java Persistence API):
+A specification for mapping Java objects to database tables.
+
+Hibernate:
+A popular implementation of JPA.
+
+Why ORM?
+
+You work with Java objects instead of SQL
+
+Hibernate generates SQL automatically
+
+Example
+@Entity
+@Table(name = "users")
+public class User {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String name;
+}
+
+
+➡ This maps the User class to the users table.
+
+3. Entity Relationships
+One-to-One
+
+Definition:
+One record maps to exactly one record.
+
+Example:
+User ↔ Profile
+
+@OneToOne
+@JoinColumn(name = "profile_id")
+private Profile profile;
+
+
+📌 Example use case: User has one profile.
+
+One-to-Many
+
+Definition:
+One parent has many children.
+
+Example:
+User → Orders
+
+@OneToMany(mappedBy = "user")
+private List<Order> orders;
+
+
+📌 One user can place many orders.
+
+Many-to-One
+
+Definition:
+Many entities belong to one parent.
+
+@ManyToOne
+@JoinColumn(name = "user_id")
+private User user;
+
+
+📌 Many orders belong to one user.
+
+Many-to-Many
+
+Definition:
+Many entities relate to many others.
+
+Example:
+Students ↔ Courses
+
+@ManyToMany
+@JoinTable(
+  name = "student_course",
+  joinColumns = @JoinColumn(name = "student_id"),
+  inverseJoinColumns = @JoinColumn(name = "course_id")
+)
+private List<Course> courses;
+
+
+📌 One student takes many courses, one course has many students.
+
+4. Spring Data JPA
+Repository Pattern
+
+Definition:
+Abstracts database access logic.
+
+public interface UserRepository extends JpaRepository<User, Long> {
+}
+
+
+➡ No SQL required for basic CRUD.
+
+Query Methods
+
+Definition:
+Spring generates queries from method names.
+
+List<User> findByName(String name);
+
+
+➡ Automatically creates:
+
+SELECT * FROM users WHERE name = ?
+
+5. Database Migration
+Definition
+
+Managing database schema changes version by version.
+
+Flyway Example
+-- V1__create_users_table.sql
+CREATE TABLE users (
+  id BIGINT PRIMARY KEY,
+  name VARCHAR(100)
+);
+
+
+📌 Runs automatically on app startup.
+
+Liquibase Example
+<changeSet id="1" author="dev">
+    <createTable tableName="users">
+        <column name="id" type="BIGINT"/>
+        <column name="name" type="VARCHAR(100)"/>
+    </createTable>
+</changeSet>
+
+
+📌 Uses XML/YAML/JSON format.
+
+6. Transaction Management
+ACID Properties
+Property	Meaning
+Atomicity	All or nothing
+Consistency	Data remains valid
+Isolation	Transactions don’t interfere
+Durability	Data survives crashes
+@Transactional
+
+Definition:
+Ensures a method runs inside a database transaction.
+
+@Transactional
+public void transferMoney(Account a, Account b, int amount) {
+    a.withdraw(amount);
+    b.deposit(amount);
+}
+
+
+📌 If any step fails → rollback.
+
+7. Query Optimization
+Indexing
+
+Definition:
+Speeds up searches on columns.
+
+CREATE INDEX idx_user_email ON users(email);
+
+
+📌 Faster WHERE email = ? queries.
+
+Eager Loading
+
+Definition:
+Related data is loaded immediately.
+
+@OneToMany(fetch = FetchType.EAGER)
+private List<Order> orders;
+
+
+⚠ Can load too much data.
+
+Lazy Loading
+
+Definition:
+Related data loads only when accessed.
+
+@OneToMany(fetch = FetchType.LAZY)
+private List<Order> orders;
+
+
+✔ Better performance if used correctly.
+
+N+1 Problem
+
+Definition:
+One query loads parent entities, then N additional queries load children.
+
+Example (Bad):
+
+List<User> users = userRepository.findAll();
+for (User user : users) {
+    user.getOrders().size(); // triggers extra query per user
+}
+
+
+📌 If 10 users → 11 queries 😬
+
+Solution
+
+Use fetch join:
+
+@Query("SELECT u FROM User u JOIN FETCH u.orders")
+List<User> findAllWithOrders();
+
+
+✔ Loads users + orders in one query.
+=================================================================================================================
+					🛠️ Hands-On Practice:
+===================================================================================================================
+1. Set up PostgreSQL Database and Connect with Spring Boot
+Definition
+
+Connecting Spring Boot to PostgreSQL allows your application to persist and retrieve data using JPA/Hibernate.
+
+Example
+
+PostgreSQL database
+
+CREATE DATABASE school_db;
+
+
+application.yml
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/school_db
+    username: postgres
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+
+📌 Spring Boot automatically creates the connection pool.
+
+2. Create Complex Entity Relationships with Proper Mappings
+Definition
+
+Entity relationships define how tables are linked using foreign keys and JPA annotations.
+
+Example
+
+Student ↔ Course (Many-to-Many)
+
+@Entity
+public class Student {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String name;
+
+    @ManyToMany
+    @JoinTable(
+        name = "student_course",
+        joinColumns = @JoinColumn(name = "student_id"),
+        inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private List<Course> courses;
+}
+
+@Entity
+public class Course {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String title;
+
+    @ManyToMany(mappedBy = "courses")
+    private List<Student> students;
+}
+
+
+📌 Uses a join table to manage relationships.
+
+3. Implement Custom Query Methods in Repositories
+Definition
+
+Spring Data JPA generates queries based on method names.
+
+Example
+public interface StudentRepository extends JpaRepository<Student, Long> {
+
+    List<Student> findByName(String name);
+
+    List<Student> findByNameContaining(String keyword);
+}
+
+
+➡ Automatically converted into SQL queries.
+
+4. Use @Query Annotation (JPQL & Native Queries)
+Definition
+
+@Query allows writing custom JPQL or native SQL queries.
+
+JPQL Example
+@Query("SELECT s FROM Student s WHERE s.name = :name")
+List<Student> findStudentsByName(@Param("name") String name);
+
+
+📌 Uses entity names, not table names.
+
+Native SQL Example
+@Query(
+  value = "SELECT * FROM student WHERE name = :name",
+  nativeQuery = true
+)
+List<Student> findStudentsNative(@Param("name") String name);
+
+
+📌 Uses actual database SQL.
+
+5. Configure Transaction Management with @Transactional
+Definition
+
+@Transactional ensures a group of database operations succeed or fail together.
+
+Example
+@Service
+public class EnrollmentService {
+
+    @Transactional
+    public void enroll(Student student, Course course) {
+        student.getCourses().add(course);
+        course.getStudents().add(student);
+    }
+}
+
+
+📌 If any error occurs → transaction rolls back.
+
+6. Create Database Migration Scripts with Flyway
+Definition
+
+Flyway manages database schema changes using versioned SQL scripts.
+
+Example
+
+Dependency
+
+<dependency>
+  <groupId>org.flywaydb</groupId>
+  <artifactId>flyway-core</artifactId>
+</dependency>
+
+
+Migration script
+
+src/main/resources/db/migration/V1__create_tables.sql
+
+CREATE TABLE student (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100)
+);
+
+CREATE TABLE course (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(100)
+);
+
+CREATE TABLE student_course (
+    student_id BIGINT,
+    course_id BIGINT,
+    PRIMARY KEY (student_id, course_id)
+);
+
+
+📌 Automatically executed on startup.
+
+7. Implement Auditing with @CreatedDate & @LastModifiedDate
+Definition
+
+Auditing automatically tracks when an entity is created or updated.
+
+Enable Auditing
+@EnableJpaAuditing
+@SpringBootApplication
+public class Application {
+}
+
+Auditable Entity
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+public class Student {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String name;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+}
+
+
+📌 createdAt → set once
+📌 updatedAt → updated automatically on changes
+
+Summary Table
+Feature	Purpose
+PostgreSQL setup	Connect app to database
+Entity relationships	Define table associations
+Query methods	Auto-generated queries
+@Query	Custom JPQL / SQL
+@Transactional	Data consistency
+Flyway	Schema versioning
+Auditing	Track create/update times
+=======================================================================================================================
+🎯 Project: E-commerce Backend with Database Integration
+Build a comprehensive e-commerce backend system with complete database integration. Implement product catalog, shopping cart, orders, payments, and user management with proper database relationships, transactions, and optimizations.
+========================================================================================================================
+Dockerizing:
+
+=================================================================================================================
+  (or) if we dont have postergesql in locally then we have to create snapshot for dockerizing in sts below like this:
+:
+✅ STEP 1: Build Spring Boot JAR (skip tests)
+
+Run this in CMD / Terminal:
+
+mvnw clean package -DskipTests
+
+
+✅ This creates the executable JAR inside target/
+❌ Tests are skipped (no DB error)
+
+✅ STEP 2: Stop any running containers (safe cleanup)
+docker-compose down
+
+✅ STEP 3: Build Docker images
+docker-compose build
+
+
+Builds your Spring Boot Docker image
+
+Uses the JAR you just created
+
+✅ STEP 4: Run containers (App + PostgreSQL)
+docker-compose up -d
+
+
+Starts PostgreSQL in Docker
+
+Starts Spring Boot app
+
+App waits until DB is ready
+
+✅ STEP 5: Verify everything is running
+docker ps
+
+
+You should see TWO containers:
+
+ecommerce-postgres
+ecommerce-app
+
+✅ STEP 6: Check backend logs (VERY IMPORTANT)
+docker logs -f ecommerce-app
+
+
+You should see:
+
+Tomcat started on port(s): 8080
+Started Application in ...
+
+
+Press CTRL + C to exit logs.
+
+✅ STEP 7: Test API (Postman)
+Create User
+POST http://localhost:8080/api/users
+
+
+Body (JSON):
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "secret123"
+}
+
+
+✔️ User inserted into PostgreSQL (Docker)
+✔️ No local DB installed
+✔️ Backend fully working
+
+🛑 IF SOMETHING FAILS
+
+Run this and send me output:
+
+docker logs ecommerce-app
+
+🎯 SUMMARY (ONE LOOK)
+mvnw clean package -DskipTests
+docker-compose down
+docker-compose build
+docker-compose up -d
+docker logs -f ecommerce-app
+
