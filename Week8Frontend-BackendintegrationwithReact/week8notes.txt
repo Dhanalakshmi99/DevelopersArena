@@ -1,0 +1,399 @@
+					📚 Theory Concepts
+=================================================================================================================================
+1. REST API Consumption
+
+Definition:
+REST (Representational State Transfer) APIs allow applications to communicate over HTTP using standard methods like GET, POST, PUT, DELETE. Consuming a REST API in React means making HTTP requests to fetch, send, update, or delete data from a server.
+
+Example using fetch:
+
+useEffect(() => {
+  fetch('https://api.example.com/users')
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .catch(err => console.error(err));
+}, []);
+
+
+Example using axios:
+
+import axios from 'axios';
+useEffect(() => {
+  axios.get('https://api.example.com/users')
+    .then(res => console.log(res.data))
+    .catch(err => console.error(err));
+}, []);
+
+2. React Hooks for API Calls
+
+Definition:
+React hooks like useState and useEffect manage state and side effects (like API calls) in functional components. Custom hooks allow reusing logic for API calls.
+
+Example:
+
+import { useState, useEffect } from 'react';
+
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(url)
+      .then(res => res.json())
+      .then(data => setData(data))
+      .catch(err => setError(err))
+      .finally(() => setLoading(false));
+  }, [url]);
+
+  return { data, loading, error };
+}
+
+3. State Management
+
+Definition:
+State management refers to storing and updating the data your component needs. In React, API data is often stored in component state using useState or globally with tools like Redux.
+
+Example:
+
+const [users, setUsers] = useState([]);
+useEffect(() => {
+  fetch('/api/users')
+    .then(res => res.json())
+    .then(data => setUsers(data));
+}, []);
+
+4. Error Handling
+
+Definition:
+Error handling ensures your app doesn’t crash when an API request fails and provides meaningful feedback to users.
+
+Example:
+
+try {
+  const response = await fetch('/api/users');
+  if (!response.ok) throw new Error('Network response was not ok');
+  const data = await response.json();
+} catch (error) {
+  console.error('Failed to fetch users:', error);
+}
+
+5. Loading States
+
+Definition:
+A loading state is a visual indicator that data is being fetched from the server, preventing empty or broken UI while waiting.
+
+Example:
+
+if (loading) return <p>Loading...</p>;
+if (error) return <p>Error: {error.message}</p>;
+return <div>{data.map(user => <p key={user.id}>{user.name}</p>)}</div>;
+
+6. CORS Configuration
+
+Definition:
+CORS (Cross-Origin Resource Sharing) allows a web app running on one domain to request resources from another domain. Without proper CORS setup, browsers block these requests.
+
+Example in Spring Boot:
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+
+@CrossOrigin(origins = "http://localhost:3000")
+@RestController
+public class UserController { ... }
+
+7. Authentication Integration (JWT Tokens)
+
+Definition:
+JWT (JSON Web Token) is used to securely transmit information between client and server. React apps store the token (usually in localStorage or sessionStorage) and send it in API requests for protected routes.
+
+Example:
+
+axios.get('/api/protected', {
+  headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+});
+
+8. Environment Configuration
+
+Definition:
+Environment variables let you store configuration like API URLs separately from code, making it easy to switch between development, testing, and production environments.
+
+Example in React:
+
+// .env
+REACT_APP_API_URL=https://api.example.com
+
+// usage in code
+const response = await fetch(`${process.env.REACT_APP_API_URL}/users`);
+
+🛠️ Hands-On Practice
+
+Here’s how the theory is applied in practice:
+
+Create React app
+
+npx create-react-app my-app
+# or using Vite
+npm create vite@latest my-app
+
+
+Implement API service layer
+
+// services/api.js
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
+export const getUsers = () => api.get('/users');
+
+
+Build components consuming Spring Boot API
+
+import { useEffect, useState } from 'react';
+import { getUsers } from './services/api';
+
+function Users() {
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    getUsers().then(res => setUsers(res.data));
+  }, []);
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+
+
+Add loading states and error boundaries
+
+if (loading) return <p>Loading...</p>;
+if (error) return <p>Error: {error.message}</p>;
+
+
+Authentication flow
+
+Login: get JWT from backend
+
+Store JWT in localStorage
+
+Include JWT in API requests
+
+Configure CORS in Spring Boot
+
+@CrossOrigin(origins = "http://localhost:3000")
+
+
+Create reusable custom hooks
+
+function useFetch(url) { ... } // as shown earlier
+
+
+Environment variables for API URLs
+
+process.env.REACT_APP_API_URL
+====================================================================================================================
+1️⃣ Create React App
+
+Use either Create React App or Vite:
+
+# Using Create React App
+npx create-react-app my-app
+cd my-app
+npm start
+
+# OR using Vite
+npm create vite@latest my-app
+cd my-app
+npm install
+npm run dev
+
+2️⃣ Implement API Service Layer (axios)
+
+Create a dedicated service file:
+
+// src/services/api.js
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
+// Example API calls
+export const getUsers = () => api.get('/users');
+export const loginUser = (credentials) => api.post('/auth/login', credentials);
+
+export default api;
+
+3️⃣ Build Components That Consume Spring Boot APIs
+
+Example Users component:
+
+// src/components/Users.js
+import { useEffect, useState } from 'react';
+import { getUsers } from '../services/api';
+
+function Users() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getUsers()
+      .then(res => setUsers(res.data))
+      .catch(err => setError(err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p>Loading users...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <ul>
+      {users.map(user => <li key={user.id}>{user.name}</li>)}
+    </ul>
+  );
+}
+
+export default Users;
+
+4️⃣ Add Loading States and Error Boundaries
+
+React 18+ allows error boundaries with class components or ErrorBoundary libraries:
+
+// Simple loading and error inside component
+if (loading) return <p>Loading...</p>;
+if (error) return <p>Error: {error.message}</p>;
+
+
+For global error boundaries, use:
+
+// src/components/ErrorBoundary.js
+import React from 'react';
+
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() { return this.state.hasError ? <h2>Something went wrong.</h2> : this.props.children; }
+}
+
+export default ErrorBoundary;
+
+5️⃣ Implement Authentication Flow with JWT Tokens
+
+Login component example:
+
+// src/components/Login.js
+import { useState } from 'react';
+import { loginUser } from '../services/api';
+
+function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await loginUser({ email, password });
+      localStorage.setItem('token', res.data.token); // Save JWT
+      alert('Login successful');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" />
+      <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" />
+      <button type="submit">Login</button>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+    </form>
+  );
+}
+
+export default Login;
+
+
+Include JWT in API calls:
+
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+6️⃣ Configure CORS in Spring Boot Backend
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RestController;
+
+@CrossOrigin(origins = "http://localhost:3000")
+@RestController
+public class UserController { ... }
+
+
+Or globally in WebMvcConfigurer:
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**").allowedOrigins("http://localhost:3000");
+    }
+}
+
+7️⃣ Create Reusable Custom Hooks for API Calls
+// src/hooks/useFetch.js
+import { useState, useEffect } from 'react';
+
+export default function useFetch(apiCall) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    apiCall()
+      .then(res => setData(res.data))
+      .catch(err => setError(err))
+      .finally(() => setLoading(false));
+  }, [apiCall]);
+
+  return { data, loading, error };
+}
+
+
+Usage:
+
+const { data: users, loading, error } = useFetch(getUsers);
+
+8️⃣ Set Up Environment Variables for API URLs
+
+Create .env in React project root:
+
+REACT_APP_API_URL=http://localhost:8080/api
+
+
+Usage in API service:
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
+
+✅ Summary of Flow:
+
+Start React app.
+
+Call Spring Boot API via axios.
+
+Display data with loading/error states.
+
+Implement login and JWT token storage.
+
+Handle CORS in backend.
+
+Use custom hooks for cleaner API calls.
+
+Use environment variables for flexibility.
+================================================================================================================================
+🎯 Project: Task Management Full Stack Application
+Build a complete full stack task management application with React frontend and Spring Boot backend. Implement user authentication, task CRUD operations, real-time updates, and a responsive user interface. This project demonstrates end-to-end full stack development skills.
