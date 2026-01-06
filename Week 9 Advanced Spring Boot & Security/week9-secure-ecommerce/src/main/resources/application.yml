@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:ecommerce-db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  secret: mysecretkey123456
+  expiration-ms: 3600000
+  refresh-expiration-ms: 86400000
+
+logging:
+  level:
+    org.springframework: INFO
