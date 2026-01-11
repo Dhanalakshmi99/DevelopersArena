@@ -1,0 +1,748 @@
+Week 10: Advanced React.js & Modern Frontend Architecture
+=================================================================================================
+📚 Theory Concepts:
+⚡ React Performance Optimization
+1️⃣ Code Splitting & Lazy Loading
+
+Why: Reduce initial bundle size → faster load.
+
+import { lazy, Suspense } from "react";
+
+const Dashboard = lazy(() => import("./Dashboard"));
+
+export default function App() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Dashboard />
+    </Suspense>
+  );
+}
+
+
+Best use cases
+
+Large pages
+
+Routes
+
+Heavy components (charts, editors)
+
+2️⃣ React.memo
+
+Prevents unnecessary re-renders when props don’t change.
+
+const Button = React.memo(({ onClick }: { onClick: () => void }) => {
+  console.log("Rendered");
+  return <button onClick={onClick}>Click</button>;
+});
+
+
+⚠️ Works best with stable props (useCallback).
+
+3️⃣ useMemo
+
+Memoizes expensive calculations
+
+const total = useMemo(() => {
+  return items.reduce((sum, i) => sum + i.price, 0);
+}, [items]);
+
+
+❌ Don’t use for simple calculations.
+
+4️⃣ useCallback
+
+Memoizes functions
+
+const handleClick = useCallback(() => {
+  setCount(c => c + 1);
+}, []);
+
+
+Used when:
+
+Passing callbacks to memoized components
+
+Dependency of useEffect
+
+🧠 State Management Patterns
+Context API
+
+✅ Small/global state
+❌ Frequent updates → performance issues
+
+const ThemeContext = createContext("light");
+
+function App() {
+  return (
+    <ThemeContext.Provider value="dark">
+      <Page />
+    </ThemeContext.Provider>
+  );
+}
+
+Redux
+
+✅ Large apps, complex logic
+✅ DevTools, middleware
+❌ Boilerplate
+
+const counterSlice = createSlice({
+  name: "counter",
+  initialState: 0,
+  reducers: {
+    increment: state => state + 1
+  }
+});
+
+Zustand
+
+✅ Simple, fast, minimal boilerplate
+🔥 Excellent alternative to Redux
+
+const useStore = create(set => ({
+  count: 0,
+  increment: () => set(state => ({ count: state.count + 1 }))
+}));
+
+🏆 Which to choose?
+App Size	Tool
+Small	Context
+Medium	Zustand
+Large	Redux
+🪝 Advanced Hooks
+useReducer
+
+Best for complex state logic
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "add": return { count: state.count + 1 };
+    default: return state;
+  }
+}
+
+const [state, dispatch] = useReducer(reducer, { count: 0 });
+
+useImperativeHandle
+
+Expose methods from child → parent
+
+useImperativeHandle(ref, () => ({
+  focus: () => inputRef.current.focus()
+}));
+
+
+Used with forwardRef.
+
+useLayoutEffect
+
+Runs before paint
+
+useLayoutEffect(() => {
+  element.style.height = "100px";
+}, []);
+
+
+⚠️ Use sparingly (blocks rendering).
+
+Custom Hooks Architecture
+
+Encapsulate logic
+
+function useFetch<T>(url: string) {
+  const [data, setData] = useState<T | null>(null);
+
+  useEffect(() => {
+    fetch(url).then(r => r.json()).then(setData);
+  }, [url]);
+
+  return data;
+}
+
+🧭 React Router v6 Advanced
+Nested Routes
+<Route path="/dashboard" element={<Dashboard />}>
+  <Route path="settings" element={<Settings />} />
+</Route>
+
+
+Use <Outlet /> in parent.
+
+Route Guards (Protected Routes)
+function ProtectedRoute({ children }) {
+  return isAuth ? children : <Navigate to="/login" />;
+}
+
+Data Loaders
+export const loader = async () => {
+  return fetch("/api/users");
+};
+
+<Route path="/users" loader={loader} element={<Users />} />
+
+🧩 Component Design Patterns
+Compound Components
+<Tabs>
+  <Tabs.List />
+  <Tabs.Panel />
+</Tabs>
+
+
+Shared internal state via Context.
+
+Render Props
+<DataFetcher render={data => <div>{data}</div>} />
+
+Higher-Order Components (HOC)
+const withAuth = Component => props =>
+  isAuth ? <Component {...props} /> : null;
+
+🧪 Testing Strategies
+Jest + React Testing Library
+render(<Button />);
+expect(screen.getByText("Click")).toBeInTheDocument();
+
+Mocking API Calls
+jest.spyOn(global, "fetch").mockResolvedValue({
+  json: async () => ({ name: "John" })
+});
+
+Testing Hooks
+const { result } = renderHook(() => useCounter());
+expect(result.current.count).toBe(0);
+
+🏗 Frontend Architecture
+Feature-Based Organization
+/features/auth
+  /components
+  /hooks
+  /services
+
+
+✅ Scalable
+✅ Easier ownership
+
+Container / Presenter
+// Container
+const UserContainer = () => {
+  const user = useUser();
+  return <UserView user={user} />;
+};
+
+Atomic Design
+Atoms → Molecules → Organisms → Templates → Pages
+
+🧾 TypeScript with React
+Advanced Props Types
+type ButtonProps<T> = {
+  value: T;
+  onClick: (value: T) => void;
+};
+
+Generics in Hooks
+function useFetch<T>(url: string): T | null
+
+Type-Safe API Responses
+type User = {
+  id: number;
+  name: string;
+};
+
+const res = await fetch("/user");
+const data: User = await res.json();=========================================================================================================================
+🛠️ Hands-On Practice:
+==================================================================================================================
+1️⃣ Implement Code Splitting with React.lazy & Suspense
+Notes
+
+Splits JS bundles automatically via dynamic import()
+
+Best for routes, feature modules, heavy UI components
+
+Works with bundlers like Vite, Webpack
+
+Example (Route-Level Splitting)
+import { lazy, Suspense } from "react";
+
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Admin = lazy(() => import("./pages/Admin"));
+
+<Suspense fallback={<div>Loading...</div>}>
+  <Routes>
+    <Route path="/dashboard" element={<Dashboard />} />
+    <Route path="/admin" element={<Admin />} />
+  </Routes>
+</Suspense>
+
+
+✔ Smaller initial bundle
+✔ Faster First Contentful Paint
+
+2️⃣ Build a Custom Global State Management Solution
+Notes
+
+Uses Context + useReducer
+
+Avoids Redux boilerplate
+
+Centralized predictable state
+
+Example: Global Store
+store.tsx
+type State = {
+  user: null | { id: string; name: string };
+};
+
+type Action =
+  | { type: "LOGIN"; payload: State["user"] }
+  | { type: "LOGOUT" };
+
+const initialState: State = { user: null };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "LOGIN":
+      return { ...state, user: action.payload };
+    case "LOGOUT":
+      return { ...state, user: null };
+    default:
+      return state;
+  }
+}
+
+const StoreContext = createContext<any>(null);
+
+export const StoreProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <StoreContext.Provider value={{ state, dispatch }}>
+      {children}
+    </StoreContext.Provider>
+  );
+};
+
+export const useStore = () => useContext(StoreContext);
+
+3️⃣ Advanced Custom Hooks
+3.1 Authentication Hook
+export function useAuth() {
+  const { state, dispatch } = useStore();
+
+  const login = (user) => dispatch({ type: "LOGIN", payload: user });
+  const logout = () => dispatch({ type: "LOGOUT" });
+
+  return { user: state.user, login, logout };
+}
+
+3.2 API Fetch Hook (Reusable & Typed)
+export function useApi<T>(url: string) {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(url)
+      .then(res => res.json())
+      .then(setData)
+      .finally(() => setLoading(false));
+  }, [url]);
+
+  return { data, loading };
+}
+
+3.3 Form Handling Hook
+export function useForm<T>(initialValues: T) {
+  const [values, setValues] = useState(initialValues);
+
+  const handleChange = (e) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
+  };
+
+  return { values, handleChange };
+}
+
+4️⃣ Nested Routing with Protection & Data Preloading
+Protected Route
+function ProtectedRoute({ children }) {
+  const { user } = useAuth();
+  return user ? children : <Navigate to="/login" />;
+}
+
+Nested Routes with Loader
+export async function dashboardLoader() {
+  return fetch("/api/dashboard");
+}
+
+<Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }
+  loader={dashboardLoader}
+>
+  <Route path="stats" element={<Stats />} />
+</Route>
+
+5️⃣ Build Reusable Component Library (TypeScript)
+Button Component
+type ButtonProps = {
+  variant?: "primary" | "secondary";
+  children: React.ReactNode;
+};
+
+export const Button = ({ variant = "primary", children }: ButtonProps) => {
+  return <button className={`btn-${variant}`}>{children}</button>;
+};
+
+Generic Input Component
+type InputProps<T> = {
+  value: T;
+  onChange: (value: T) => void;
+};
+
+export function Input<T extends string | number>({
+  value,
+  onChange
+}: InputProps<T>) {
+  return <input value={value} onChange={e => onChange(e.target.value as T)} />;
+}
+
+6️⃣ Unit & Integration Testing
+Unit Test (Component)
+test("renders button", () => {
+  render(<Button>Click</Button>);
+  expect(screen.getByText("Click")).toBeInTheDocument();
+});
+
+Integration Test (Auth Flow)
+test("login updates global state", () => {
+  render(
+    <StoreProvider>
+      <Login />
+    </StoreProvider>
+  );
+  fireEvent.click(screen.getByText("Login"));
+  expect(screen.getByText("Logout")).toBeInTheDocument();
+});
+
+7️⃣ Bundle Size & Performance Optimization
+Techniques
+
+✔ Code splitting
+✔ Tree shaking
+✔ Memoization
+✔ Avoid anonymous functions
+
+Example
+const MemoCard = React.memo(Card);
+
+Analyze Bundle
+npm run build
+npx vite-bundle-visualizer
+
+8️⃣ Real-Time Features with WebSocket
+Notes
+
+Used for chat, notifications, live updates
+
+Works with native WebSocket or Socket.io
+
+WebSocket Hook
+export function useWebSocket(url: string) {
+  const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    const ws = new WebSocket(url);
+    ws.onmessage = event => setMessage(event.data);
+
+    return () => ws.close();
+  }, [url]);
+
+  return message;
+}
+
+Usage
+const message = useWebSocket("wss://example.com/chat");
+
+return <div>{message}</div>;
+===============================================================================================================
+🎯 Project: Enterprise Dashboard with Real-time Analytics & Advanced State Management
+Build a sophisticated enterprise dashboard featuring real-time analytics, advanced state management with Redux Toolkit, TypeScript integration, comprehensive testing, and performance optimization. This project demonstrates production-ready React architecture with focus on scalability, maintainability, and user experience.
+
+
+🚀 STEP 1: Create Project (Vite + React 18 + TS)
+npm create vite@latest enterprise-dashboard -- --template react-ts
+cd enterprise-dashboard
+npm install
+
+📦 STEP 2: Install Core Dependencies
+# State & routing
+npm install @reduxjs/toolkit react-redux redux-persist
+npm install react-router-dom@6
+
+# Server state
+npm install @tanstack/react-query
+
+# UI + charts
+npm install @mui/material @mui/icons-material
+npm install recharts
+
+# WebSocket (native, no lib needed)
+
+# i18n
+npm install i18next react-i18next
+
+# PWA
+npm install vite-plugin-pwa
+
+# Testing
+npm install -D jest @testing-library/react @testing-library/jest-dom
+npm install -D cypress msw
+
+# Storybook
+npx storybook@latest init
+
+🗂️ STEP 3: Final Folder Structure
+src/
+├── app/
+│   ├── store.ts
+│   ├── hooks.ts
+│   └── providers.tsx
+├── features/
+│   ├── auth/
+│   │   ├── authSlice.ts
+│   │   └── useAuth.ts
+│   ├── dashboard/
+│   │   ├── dashboardSlice.ts
+│   │   ├── DashboardPage.tsx
+│   │   └── charts/
+│   └── notifications/
+│       └── notificationSlice.ts
+├── components/
+│   ├── atoms/
+│   ├── molecules/
+│   └── organisms/
+├── hooks/
+│   ├── useWebSocket.ts
+│   └── useLocalStorage.ts
+├── routes/
+│   ├── AppRoutes.tsx
+│   └── ProtectedRoute.tsx
+├── services/
+│   ├── api.ts
+│   └── websocket.ts
+├── i18n/
+│   └── index.ts
+├── pages/
+│   ├── Login.tsx
+│   └── NotFound.tsx
+├── main.tsx
+└── App.tsx
+
+🧠 STEP 4: Redux Toolkit Store (CORE)
+src/app/store.ts
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "../features/auth/authSlice";
+import dashboardReducer from "../features/dashboard/dashboardSlice";
+import notificationReducer from "../features/notifications/notificationSlice";
+
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    dashboard: dashboardReducer,
+    notifications: notificationReducer
+  },
+  devTools: true
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+src/app/hooks.ts
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "./store";
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+🔐 STEP 5: Auth Slice + Hook
+features/auth/authSlice.ts
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+interface AuthState {
+  user: string | null;
+  isAuthenticated: boolean;
+}
+
+const initialState: AuthState = {
+  user: null,
+  isAuthenticated: false
+};
+
+const authSlice = createSlice({
+  name: "auth",
+  initialState,
+  reducers: {
+    login: (state, action: PayloadAction<string>) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+    },
+    logout: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+    }
+  }
+});
+
+export const { login, logout } = authSlice.actions;
+export default authSlice.reducer;
+
+features/auth/useAuth.ts
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { login, logout } from "./authSlice";
+
+export const useAuth = () => {
+  const auth = useAppSelector(s => s.auth);
+  const dispatch = useAppDispatch();
+
+  return {
+    ...auth,
+    login: (user: string) => dispatch(login(user)),
+    logout: () => dispatch(logout())
+  };
+};
+
+🧭 STEP 6: Routing + Guard
+routes/ProtectedRoute.tsx
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../features/auth/useAuth";
+
+export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" />;
+};
+
+routes/AppRoutes.tsx
+import { Routes, Route } from "react-router-dom";
+import { ProtectedRoute } from "./ProtectedRoute";
+import DashboardPage from "../features/dashboard/DashboardPage";
+import Login from "../pages/Login";
+
+export const AppRoutes = () => (
+  <Routes>
+    <Route path="/login" element={<Login />} />
+    <Route
+      path="/"
+      element={
+        <ProtectedRoute>
+          <DashboardPage />
+        </ProtectedRoute>
+      }
+    />
+  </Routes>
+);
+
+📊 STEP 7: Dashboard + Charts
+features/dashboard/dashboardSlice.ts
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+interface Metric {
+  id: string;
+  value: number;
+}
+
+interface DashboardState {
+  metrics: Metric[];
+}
+
+const initialState: DashboardState = {
+  metrics: []
+};
+
+const dashboardSlice = createSlice({
+  name: "dashboard",
+  initialState,
+  reducers: {
+    setMetric: (state, action: PayloadAction<Metric>) => {
+      state.metrics.push(action.payload);
+    }
+  }
+});
+
+export const { setMetric } = dashboardSlice.actions;
+export default dashboardSlice.reducer;
+
+DashboardPage.tsx
+import { LineChart, Line, XAxis, YAxis } from "recharts";
+import { useAppSelector } from "../../app/hooks";
+
+export default function DashboardPage() {
+  const data = useAppSelector(s => s.dashboard.metrics);
+
+  return (
+    <LineChart width={600} height={300} data={data}>
+      <XAxis dataKey="id" />
+      <YAxis />
+      <Line type="monotone" dataKey="value" stroke="#1976d2" />
+    </LineChart>
+  );
+}
+
+🔌 STEP 8: WebSocket (Real-Time)
+services/websocket.ts
+export class WebSocketService {
+  private ws?: WebSocket;
+
+  connect(url: string, onMessage: (data: any) => void) {
+    this.ws = new WebSocket(url);
+    this.ws.onmessage = e => onMessage(JSON.parse(e.data));
+  }
+
+  disconnect() {
+    this.ws?.close();
+  }
+}
+
+hooks/useWebSocket.ts
+import { useEffect } from "react";
+import { WebSocketService } from "../services/websocket";
+import { useAppDispatch } from "../app/hooks";
+import { setMetric } from "../features/dashboard/dashboardSlice";
+
+export const useWebSocket = (url: string) => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const ws = new WebSocketService();
+    ws.connect(url, data => dispatch(setMetric(data)));
+    return () => ws.disconnect();
+  }, [url]);
+};
+
+🌍 STEP 9: React Query
+main.tsx
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const client = new QueryClient();
+
+<QueryClientProvider client={client}>
+  <App />
+</QueryClientProvider>
+
+🧪 STEP 10: Testing Example
+Dashboard.test.tsx
+import { render, screen } from "@testing-library/react";
+import DashboardPage from "./DashboardPage";
+
+test("renders chart", () => {
+  render(<DashboardPage />);
+  expect(screen.getByRole("img")).toBeInTheDocument();
+});
+
+▶️ Run the Project
+npm run dev
+npm run test
+npm run storybook
