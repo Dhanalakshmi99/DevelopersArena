@@ -1,0 +1,701 @@
+Week 11: Full Stack Architecture & Microservices
+===================================================================================================================
+📚 Theory Concepts:
+================================================================================================================
+1. Microservices Design Patterns
+1.1 Service Discovery
+
+Problem: Services change IPs/ports dynamically (autoscaling, containers).
+
+Solutions:
+
+Client-side discovery: Client queries service registry.
+
+Server-side discovery: Load balancer queries registry.
+
+Tools: Eureka, Consul, Kubernetes DNS
+
+Example (Kubernetes):
+
+order-service.default.svc.cluster.local
+
+
+Kubernetes DNS resolves service names automatically.
+
+1.2 API Gateway
+
+Problem: Clients shouldn’t call dozens of services directly.
+
+Responsibilities:
+
+Routing
+
+Authentication
+
+Rate limiting
+
+Aggregation
+
+Logging
+
+Tools: Kong, NGINX, Spring Cloud Gateway, AWS API Gateway
+
+Example:
+
+Client → API Gateway → Order Service → Payment Service
+
+1.3 Circuit Breaker
+
+Problem: Prevent cascading failures.
+
+States:
+
+Closed → normal
+
+Open → fail fast
+
+Half-open → test recovery
+
+Tools: Resilience4j, Hystrix
+
+Example:
+
+@CircuitBreaker(name="paymentService", fallbackMethod="fallback")
+public Payment processPayment() {
+    return paymentClient.pay();
+}
+
+1.4 Saga Pattern
+
+Problem: Distributed transactions without 2PC.
+
+Types:
+
+Choreography: Services react to events
+
+Orchestration: Central saga controller
+
+Example (Order Saga):
+
+Create Order
+
+Reserve Inventory
+
+Process Payment
+
+Confirm Order
+
+Compensation:
+
+Payment fails → release inventory
+
+2. Domain-Driven Design (DDD)
+2.1 Bounded Context
+
+Definition: Clear boundary where a domain model applies.
+
+Example:
+
+Order Context
+Billing Context
+Shipping Context
+
+
+Each has its own model and database.
+
+2.2 Aggregates
+
+Definition: Cluster of domain objects with one Aggregate Root.
+
+Rules:
+
+One entry point
+
+Consistency enforced inside aggregate
+
+Example:
+
+Order (root)
+ ├── OrderItem
+ ├── Address
+
+2.3 Value Objects
+
+Characteristics:
+
+Immutable
+
+No identity
+
+Equality by value
+
+Example:
+
+class Money {
+    BigDecimal amount;
+    String currency;
+}
+
+2.4 Domain Events
+
+Purpose: Notify other parts of the system about business events.
+
+Example:
+
+OrderPlaced
+PaymentCompleted
+
+
+Usage:
+
+publish(new OrderPlacedEvent(orderId));
+
+3. Event-Driven Architecture (EDA)
+3.1 Event Sourcing
+
+Idea: Store state as a sequence of events.
+
+Instead of:
+
+order_status = SHIPPED
+
+
+Store:
+
+OrderCreated
+OrderPaid
+OrderShipped
+
+
+Benefits:
+
+Full audit log
+
+Time travel
+
+3.2 CQRS (Command Query Responsibility Segregation)
+
+Separate:
+
+Commands → write
+
+Queries → read
+
+Example:
+
+Command DB (normalized)
+Read DB (denormalized)
+
+
+Typical stack:
+
+Write: PostgreSQL
+
+Read: Elasticsearch / Redis
+
+3.3 Message Brokers
+Kafka
+
+High throughput
+
+Event streaming
+
+Persistent log
+
+Use case: Event sourcing, analytics
+
+RabbitMQ
+
+Message queues
+
+Routing, retries
+
+Use case: Task processing
+
+Example:
+
+Order Service → Kafka → Shipping Service
+
+4. API Gateway Patterns
+4.1 Routing
+/api/orders → Order Service
+/api/payments → Payment Service
+
+4.2 Aggregation
+
+Problem: Reduce client round-trips.
+
+Example:
+
+GET /order-details
+→ Order Service
+→ Payment Service
+→ Shipping Service
+
+4.3 Authentication
+
+JWT
+
+OAuth2
+
+OpenID Connect
+
+Example:
+
+Authorization: Bearer eyJhbGciOi...
+
+4.4 Rate Limiting
+
+Example:
+
+100 requests/minute per IP
+
+
+Protection against:
+
+DDoS
+
+Abuse
+
+5. Service Communication
+5.1 Synchronous Communication
+REST
+
+Human-readable
+
+HTTP-based
+
+Example:
+
+GET /orders/123
+
+gRPC
+
+Binary (Protobuf)
+
+Faster
+
+Strong contracts
+
+Use case: Internal service-to-service
+
+5.2 Asynchronous Communication
+
+Patterns:
+
+Publish/Subscribe
+
+Event-driven
+
+Example:
+
+OrderPlaced event → Inventory updates asynchronously
+
+
+Benefits:
+
+Loose coupling
+
+Better resilience
+
+6. Distributed Data Management
+6.1 Database per Service (Recommended)
+
+Pros:
+
+Autonomy
+
+Scalability
+
+Cons:
+
+Data duplication
+
+6.2 Shared Database (Anti-pattern)
+
+Problems:
+
+Tight coupling
+
+Schema conflicts
+
+6.3 Eventual Consistency
+
+Definition: Data becomes consistent over time.
+
+Example:
+
+Order placed → Inventory updated after 200ms
+
+
+Handled via:
+
+Events
+
+Sagas
+
+7. Container Orchestration
+7.1 Docker Basics
+FROM openjdk:17
+COPY app.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]
+
+7.2 Kubernetes Basics
+
+Key Objects:
+
+Pod
+
+Deployment
+
+Service
+
+ConfigMap
+
+Secret
+
+Example:
+
+Deployment → manages Pods
+Service → exposes Pods
+
+7.3 Service Mesh
+Istio / Linkerd
+
+Provides:
+
+Traffic management
+
+mTLS
+
+Retries
+
+Circuit breaking
+
+Architecture:
+
+App Container + Sidecar Proxy
+
+8. Observability
+8.1 Distributed Tracing
+
+Tracks request flow across services
+
+Tools: Jaeger, Zipkin
+
+Trace example:
+
+API Gateway → Order → Payment → Inventory
+
+8.2 Logging Aggregation
+
+Centralized logs
+
+Stack:
+
+ELK (Elasticsearch, Logstash, Kibana)
+
+EFK (Fluentd instead of Logstash)
+
+8.3 Metrics Collection
+
+Metrics:
+
+Latency
+
+Throughput
+
+Error rate
+
+Tools: Prometheus + Grafana
+
+Example:
+
+http_requests_total
+request_duration_seconds
+
+How These Fit Together (Big Picture)
+Client
+ ↓
+API Gateway
+ ↓
+Microservices (DDD Bounded Contexts)
+ ↓
+Events (Kafka)
+ ↓
+Observability (Logs, Metrics, Traces)
+ ↓
+Kubernetes + Service Mesh
+=========================================================================================
+🛠️ Hands-On Microservices Practice (Spring Boot + Cloud + Kubernetes)
+
+We’ll assume a sample system:
+
+API Gateway
+ ├── Order Service
+ ├── Payment Service
+ ├── Inventory Service
+ ├── Kafka
+ ├── Eureka (Service Discovery)
+ ├── Zipkin (Tracing)
+ ├── ELK (Logging)
+ └── Kubernetes Cluster
+
+1️⃣ Design & Implement Microservices Architecture
+Design Principles
+
+One bounded context per service
+
+Database per service
+
+Communicate via REST + Events
+
+Stateless services
+
+Example Services
+Service	Responsibility
+Order Service	Order lifecycle
+Payment Service	Payment processing
+Inventory Service	Stock management
+Spring Boot Dependency (common)
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+2️⃣ Set Up Spring Cloud Gateway (API Routing)
+Purpose
+
+Single entry point
+
+Routing + filtering
+
+Security & rate limiting
+
+Dependency
+<dependency>
+  <groupId>org.springframework.cloud</groupId>
+  <artifactId>spring-cloud-starter-gateway</artifactId>
+</dependency>
+
+Gateway Configuration (application.yml)
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/orders/**
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payments/**
+
+
+👉 lb:// integrates with Eureka.
+
+3️⃣ Implement Service Discovery (Eureka / Consul)
+Eureka Server
+Dependency
+<dependency>
+  <groupId>org.springframework.cloud</groupId>
+  <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+</dependency>
+
+Enable Server
+@EnableEurekaServer
+@SpringBootApplication
+public class EurekaServerApplication {}
+
+application.yml
+server:
+  port: 8761
+
+Eureka Client (Order Service)
+Dependency
+<dependency>
+  <groupId>org.springframework.cloud</groupId>
+  <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+
+Configuration
+spring:
+  application:
+    name: ORDER-SERVICE
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:8761/eureka
+
+4️⃣ Dockerize Each Microservice
+Dockerfile (Spring Boot)
+FROM eclipse-temurin:17-jdk-alpine
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
+
+Build & Run
+docker build -t order-service .
+docker run -p 8081:8080 order-service
+
+5️⃣ Event-Driven Communication with Kafka
+Use Case
+
+Order placed → Inventory updated
+
+Payment processed → Order confirmed
+
+Dependency
+<dependency>
+  <groupId>org.springframework.kafka</groupId>
+  <artifactId>spring-kafka</artifactId>
+</dependency>
+
+Kafka Producer (Order Service)
+@Autowired
+private KafkaTemplate<String, String> kafkaTemplate;
+
+public void publishOrderEvent(String orderId) {
+    kafkaTemplate.send("order-events", orderId);
+}
+
+Kafka Consumer (Inventory Service)
+@KafkaListener(topics = "order-events")
+public void consume(String orderId) {
+    System.out.println("Reserve inventory for order " + orderId);
+}
+
+application.yml
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: inventory-group
+
+6️⃣ Distributed Tracing (Sleuth + Zipkin)
+Purpose
+
+Trace a request across services.
+
+Dependency
+<dependency>
+  <groupId>org.springframework.cloud</groupId>
+  <artifactId>spring-cloud-starter-sleuth</artifactId>
+</dependency>
+<dependency>
+  <groupId>io.zipkin.reporter2</groupId>
+  <artifactId>zipkin-reporter-brave</artifactId>
+</dependency>
+
+Configuration
+spring:
+  zipkin:
+    base-url: http://zipkin:9411
+  sleuth:
+    sampler:
+      probability: 1.0
+
+Result
+Trace:
+Gateway → Order → Payment → Kafka → Inventory
+
+
+View in Zipkin UI.
+
+7️⃣ Centralized Logging with ELK Stack
+Goal
+
+All service logs in one place.
+
+Logging Format
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId}] %-5level %logger - %msg%n"
+
+Stack
+
+Filebeat / Fluentd → Elasticsearch → Kibana
+
+Docker Compose (simplified)
+elasticsearch:
+  image: elasticsearch:8.11.0
+
+kibana:
+  image: kibana:8.11.0
+
+Benefit
+
+Search logs by traceId
+
+Correlate logs with Zipkin traces
+
+8️⃣ Deploy Microservices to Kubernetes
+Kubernetes Objects
+
+Deployment
+
+Service
+
+ConfigMap
+
+Secret
+
+Deployment YAML (Order Service)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+      - name: order-service
+        image: order-service:latest
+        ports:
+        - containerPort: 8080
+
+Service YAML
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  selector:
+    app: order-service
+  ports:
+    - port: 80
+      targetPort: 8080
+
+Apply to Cluster
+kubectl apply -f order-deployment.yaml
+kubectl apply -f order-service.yaml
+
+9️⃣ End-to-End Flow (Final)
+Client
+ ↓
+Spring Cloud Gateway
+ ↓
+Order Service (REST)
+ ↓
+Kafka Event
+ ↓
+Inventory Service
+ ↓
+Logs → ELK
+ ↓
+Traces → Zipkin
+ ↓
+Metrics → Prometheus
+ ↓
+Kubernetes (Scaling & Resilience)
+
+==================================================================================================
